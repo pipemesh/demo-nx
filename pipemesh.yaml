@@ -16,7 +16,7 @@ dispatch:
   jobs:
     graph:
       stage: graph
-      image: node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1
+      image: node:24-bookworm@sha256:64af3819f9275802414d7cdc38c27e9d82bd564dec4d4da87d008255d36c63b4
       cache: { key: "npm-${checksum:package-lock.json}", paths: [.npm] }
       script: |
         npm ci --cache .npm --prefer-offline --no-audit --no-fund

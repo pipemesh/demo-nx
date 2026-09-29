@@ -11,6 +11,10 @@ RUN apt-get update \
 
 # Every npm command reads and writes this cache.
 ENV npm_config_cache=/opt/npm-cache NX_DAEMON=false
+# In CI, Nx Cloud uploads each run's CPU and memory metrics to a "run group"
+# only its own CI integrations create; ours never exists, and every job
+# spent about a minute retrying the upload on a 404 after its tasks were done.
+ENV NX_CLOUD_DISABLE_METRICS_COLLECTION=true
 
 COPY . /tmp/ws
 RUN cd /tmp/ws && npm ci --no-audit --no-fund && rm -rf /tmp/ws

@@ -9,7 +9,7 @@ tested with Node's built-in test runner.
 - **Dispatch by Nx's own inputs.** The `graph` job fingerprints each
   service from the files Nx counts as inputs of its `build` and `test`
   targets (`nx show target inputs`), including the libraries it depends on
-  (`tools/fingerprint.mjs`).
+  (the `nx/fingerprint@1` component).
 - **One pipeline per service.** Each service has its own pipeline, and
   receives a revision only when its fingerprint changed since it was last
   dispatched. A service that sat out ten commits sees all ten when the next
@@ -36,7 +36,7 @@ Pull requests run `nx affected -t test build` against the merge base.
 ```sh
 npm ci
 npx nx run-many -t test build
-node tools/fingerprint.mjs   # writes fingerprints/<service>
+npx nx show target inputs @demo/orders:build   # what the orders fingerprint hashes
 ```
 
 See the pipeline at https://pipemesh.dev/github.com/pipemesh/demo-nx.

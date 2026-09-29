@@ -3,7 +3,7 @@
 # only when a file Nx counts as one of its inputs changed.
 #
 # How: the graph job fingerprints every deployable project from Nx's own
-# inputs (tools/fingerprint.mjs, `nx show target inputs`) and produces one
+# inputs (the nx/fingerprint component, `nx show target inputs`) and produces one
 # entry per service. Each dispatch job consumes its service's entry and
 # dispatches when it changed since that job last dispatched: a service that
 # sat out ten commits still sees all ten when the next one changes it, and a
@@ -16,11 +16,14 @@ dispatch:
   jobs:
     graph:
       stage: graph
-      image: node:24-bookworm@sha256:64af3819f9275802414d7cdc38c27e9d82bd564dec4d4da87d008255d36c63b4
+      # Every fingerprint also covers the service pipeline's config and the
+      # deploy scripts, which Nx's inputs cannot see.
+      uses: nx/fingerprint@1
+      with:
+        image: node:24-bookworm@sha256:64af3819f9275802414d7cdc38c27e9d82bd564dec4d4da87d008255d36c63b4
+        install: npm ci --cache .npm --prefer-offline --no-audit --no-fund
+        extra: .pipemesh/service.yaml deploy
       cache: { key: "npm-${checksum:package-lock.json}", paths: [.npm] }
-      script: |
-        npm ci --cache .npm --prefer-offline --no-audit --no-fund
-        NX_DAEMON=false node tools/fingerprint.mjs fingerprints
       produces:
         orders: fingerprints/orders
         payments: fingerprints/payments

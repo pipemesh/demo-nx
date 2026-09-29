@@ -18,12 +18,15 @@ tested with Node's built-in test runner.
   they ship is new to them. esbuild output is byte-reproducible and drops
   comments, so a comment or a test change builds and stops there.
 
+Measured on pipemesh.dev (revisions 5–9):
+
 | Change | Services dispatched | Deploys |
 |---|---|---|
 | README | none | none |
 | Comment in `libs/money` | orders, payments, catalog | none (identical bundles) |
 | Test-only change in `apps/orders` | orders | none (identical bundle) |
 | Code change in `libs/money` | orders, payments, catalog | those three |
+| Service pipeline config (`.pipemesh/service.yaml`) | all five | none (identical bundles) |
 | `deploy/` script | all five | all five |
 
 Pull requests run `nx affected -t test build` against the merge base.

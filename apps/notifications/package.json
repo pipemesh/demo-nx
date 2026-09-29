@@ -1,0 +1,13 @@
+{
+  "name": "@demo/notifications",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@demo/events": "*"
+  },
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --platform=node --format=esm --outfile=dist/notifications.js",
+    "test": "node --test src/*.test.ts"
+  }
+}

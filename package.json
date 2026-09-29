@@ -1,0 +1,13 @@
+{
+  "name": "demo-nx",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "devDependencies": {
+    "nx": "23.2.1",
+    "esbuild": "0.28.2"
+  }
+}

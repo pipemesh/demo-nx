@@ -1,0 +1,71 @@
+# An Nx monorepo on PipeMesh: one dispatch pipeline fans each revision out
+# to a pipeline per service, and a service's pipeline receives the revision
+# only when a file Nx counts as one of its inputs changed.
+#
+# How: the graph job fingerprints every deployable project from Nx's own
+# inputs (tools/fingerprint.mjs, `nx show target inputs`) and produces one
+# entry per service. Each dispatch job consumes its service's entry and
+# dispatches when it changed since that job last dispatched: a service that
+# sat out ten commits still sees all ten when the next one changes it, and a
+# README or a sibling's change reaches no one.
+
+service: !include .pipemesh/service.yaml
+
+dispatch:
+  stages: [graph, dispatch]
+  jobs:
+    graph:
+      stage: graph
+      image: node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1
+      cache: { key: "npm-${checksum:package-lock.json}", paths: [.npm] }
+      script: |
+        npm ci --cache .npm --prefer-offline --no-audit --no-fund
+        NX_DAEMON=false node tools/fingerprint.mjs fingerprints
+      produces:
+        orders: fingerprints/orders
+        payments: fingerprints/payments
+        inventory: fingerprints/inventory
+        notifications: fingerprints/notifications
+        catalog: fingerprints/catalog
+
+    orders:
+      stage: dispatch
+      consumes: [graph/orders]
+      rules: [{ consumed: changed }]
+      delegate:
+        type: pipeline
+        params: { body: !ref service, variables: { SERVICE: orders } }
+    payments:
+      stage: dispatch
+      consumes: [graph/payments]
+      rules: [{ consumed: changed }]
+      delegate:
+        type: pipeline
+        params: { body: !ref service, variables: { SERVICE: payments } }
+    inventory:
+      stage: dispatch
+      consumes: [graph/inventory]
+      rules: [{ consumed: changed }]
+      delegate:
+        type: pipeline
+        params: { body: !ref service, variables: { SERVICE: inventory } }
+    notifications:
+      stage: dispatch
+      consumes: [graph/notifications]
+      rules: [{ consumed: changed }]
+      delegate:
+        type: pipeline
+        params: { body: !ref service, variables: { SERVICE: notifications } }
+    catalog:
+      stage: dispatch
+      consumes: [graph/catalog]
+      rules: [{ consumed: changed }]
+      delegate:
+        type: pipeline
+        params: { body: !ref service, variables: { SERVICE: catalog } }
+
+pipemesh:
+  pipelines:
+    pipeline: !ref dispatch
+  workflows:
+    checks: { body: !include .pipemesh/checks.yaml, on: pull_request }

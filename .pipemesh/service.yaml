@@ -7,7 +7,7 @@ jobs:
   build:
     stage: build
     image: node:24-bookworm@sha256:64af3819f9275802414d7cdc38c27e9d82bd564dec4d4da87d008255d36c63b4
-    cache: { key: "npm-${checksum:package-lock.json}", paths: [.npm], policy: pull }
+    cache: { key: "npm-${checksum:package-lock.json}", paths: [.npm] }
     script: |
       npm ci --cache .npm --prefer-offline --no-audit --no-fund
       NX_DAEMON=false npx nx run-many -t test build -p @demo/$SERVICE

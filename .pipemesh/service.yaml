@@ -6,7 +6,7 @@ stages: [build, staging, production]
 jobs:
   build:
     stage: build
-    image: ghcr.io/pipemesh/demo-nx-ci@sha256:6b023ae7f81c8ae8629923f5e0f1322de215ec1fd02097093242e891464a4980
+    image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
     # Nx Cloud's remote cache: this read-write token reaches only this
     # pipeline's builds. Pull requests never receive a secret, and Nx Cloud
     # gives runs without a token read-only access, so proposed code can
@@ -24,13 +24,13 @@ jobs:
   # is new to them, or when the deploy script changed since they last ran.
   deploy_staging:
     stage: staging
-    image: ghcr.io/pipemesh/demo-nx-ci@sha256:6b023ae7f81c8ae8629923f5e0f1322de215ec1fd02097093242e891464a4980
+    image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
     consumes: [build/bundle]
     rules: [{ consumed: changed }, { changes: [deploy/**] }]
     script: deploy/deploy.sh $SERVICE staging
   deploy_prod:
     stage: production
-    image: ghcr.io/pipemesh/demo-nx-ci@sha256:6b023ae7f81c8ae8629923f5e0f1322de215ec1fd02097093242e891464a4980
+    image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
     needs: [deploy_staging]
     consumes: [build/bundle]
     rules: [{ consumed: changed }, { changes: [deploy/**] }]

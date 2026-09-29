@@ -4,7 +4,7 @@ stages: [test]
 jobs:
   affected:
     stage: test
-    image: ghcr.io/pipemesh/demo-nx-ci@sha256:6b023ae7f81c8ae8629923f5e0f1322de215ec1fd02097093242e891464a4980
+    image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
     script: |
       npm ci --prefer-offline --no-audit --no-fund
       base=$(git merge-base "origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" HEAD)

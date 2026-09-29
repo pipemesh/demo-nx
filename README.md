@@ -35,3 +35,5 @@ npm ci
 npx nx run-many -t test build
 node tools/fingerprint.mjs   # writes fingerprints/<service>
 ```
+
+See the pipeline at https://pipemesh.dev/github.com/pipemesh/demo-nx.

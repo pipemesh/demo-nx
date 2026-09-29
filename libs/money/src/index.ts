@@ -6,5 +6,5 @@ export function add(a: Cents, b: Cents): Cents {
 }
 
 export function format(c: Cents): string {
-  return `$${(c / 100).toFixed(2)}`;
+  return `$${(c / 100).toFixed(2)} USD`;
 }

@@ -8,6 +8,11 @@ jobs:
     stage: build
     image: node:24-bookworm@sha256:64af3819f9275802414d7cdc38c27e9d82bd564dec4d4da87d008255d36c63b4
     cache: { key: "npm-${checksum:package-lock.json}", paths: [.npm] }
+    # Nx Cloud's remote cache: this read-write token reaches only this
+    # pipeline's builds. Pull requests never receive a secret, and Nx Cloud
+    # gives runs without a token read-only access, so proposed code can
+    # read the cache but never write to it.
+    secrets: [NX_CLOUD_ACCESS_TOKEN]
     script: |
       npm ci --cache .npm --prefer-offline --no-audit --no-fund
       NX_DAEMON=false npx nx run-many -t test build -p @demo/$SERVICE

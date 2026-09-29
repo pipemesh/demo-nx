@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # A puppet deploy: ships the service's bundle "to" an environment and
 # smoke-tests it. Swap for your real rollout.
 set -eu

@@ -1,3 +1,4 @@
+// Money is integer cents throughout.
 export type Cents = number;
 
 export function add(a: Cents, b: Cents): Cents {

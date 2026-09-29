@@ -4,9 +4,8 @@ stages: [test]
 jobs:
   affected:
     stage: test
-    image: node:24-bookworm@sha256:64af3819f9275802414d7cdc38c27e9d82bd564dec4d4da87d008255d36c63b4
-    cache: { key: "npm-${checksum:package-lock.json}", paths: [.npm] }
+    image: ghcr.io/pipemesh/demo-nx-ci@sha256:6b023ae7f81c8ae8629923f5e0f1322de215ec1fd02097093242e891464a4980
     script: |
-      npm ci --cache .npm --prefer-offline --no-audit --no-fund
+      npm ci --prefer-offline --no-audit --no-fund
       base=$(git merge-base "origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" HEAD)
       NX_DAEMON=false npx nx affected -t test build --base="$base" --head=HEAD

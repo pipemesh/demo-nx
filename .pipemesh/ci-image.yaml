@@ -5,7 +5,7 @@ stages: [image]
 jobs:
   ci_image:
     stage: image
-    sources: [ci/**, .dockerignore, package.json, package-lock.json, apps/*/package.json, libs/*/package.json]
+    paths: [ci, .dockerignore, package.json, package-lock.json, apps/*/package.json, libs/*/package.json]
     secrets: [GHCR_TOKEN]
     script: |
       img=ghcr.io/pipemesh/demo-nx-ci

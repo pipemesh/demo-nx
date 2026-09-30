@@ -26,12 +26,12 @@ jobs:
     stage: staging
     image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
     consumes: [build/bundle]
-    sources: [deploy/**]
+    paths: [deploy]
     script: deploy/deploy.sh $SERVICE staging
   deploy_prod:
     stage: production
     image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
     needs: [deploy_staging]
     consumes: [build/bundle]
-    sources: [deploy/**]
+    paths: [deploy]
     script: deploy/deploy.sh $SERVICE production

@@ -6,6 +6,9 @@ jobs:
   ci_image:
     stage: image
     paths: [ci, .dockerignore, package.json, package-lock.json, apps/*/package.json, libs/*/package.json]
+    # A run whose fingerprint matches a stored run reuses it; a workflow
+    # run has no "unchanged" (Pipemesh, 2026-10-01).
+    skip: built
     secrets: [GHCR_TOKEN]
     script: |
       img=ghcr.io/pipemesh/demo-nx-ci

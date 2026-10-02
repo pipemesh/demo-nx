@@ -1,6 +1,6 @@
 # demo-nx
 
-An Nx monorepo on [PipeMesh](https://pipemesh.dev): five services (`apps/`)
+An Nx monorepo on [Pipemesh](https://pipemesh.io): five services (`apps/`)
 and three shared libraries (`libs/`), TypeScript, bundled with esbuild and
 tested with Node's built-in test runner.
 
@@ -18,7 +18,7 @@ tested with Node's built-in test runner.
   they ship is new to them. esbuild output is byte-reproducible and drops
   comments, so a comment or a test change builds and stops there.
 
-Measured on pipemesh.dev (revisions 5–9):
+Measured on pipemesh.io (revisions 5–9):
 
 | Change | Services dispatched | Deploys |
 |---|---|---|
@@ -39,4 +39,4 @@ npx nx run-many -t test build
 npx nx show target inputs @demo/orders:build   # what the orders fingerprint hashes
 ```
 
-See the pipeline at https://pipemesh.dev/github.com/pipemesh/demo-nx.
+See the pipeline at https://pipemesh.io/github.com/pipemesh/demo-nx.

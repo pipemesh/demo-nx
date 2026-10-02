@@ -1,4 +1,4 @@
-# An Nx monorepo on PipeMesh: one dispatch pipeline fans each revision out
+# An Nx monorepo on Pipemesh: one dispatch pipeline fans each revision out
 # to a pipeline per service, and a service's pipeline receives the revision
 # only when a file Nx counts as one of its inputs changed.
 #
@@ -12,22 +12,8 @@
 service: !include .pipemesh/service.yaml
 
 dispatch:
-  # DESIGN-V68: a repository this pipeline reads besides its own. Every
-  # revision pins a version of it, and a push to it starts a revision.
-  repos:
-    components: github.com/pipemesh/components
   stages: [graph, dispatch]
   jobs:
-    # Works in the components repository, where the nx/fingerprint component
-    # this pipeline uses lives, at the version its revision pinned.
-    components:
-      stage: graph
-      repo: components
-      paths: [nx]
-      script: |
-        ls nx
-        head -n 5 nx/fingerprint.yaml
-
     graph:
       stage: graph
       # Every fingerprint also covers the service pipeline's config and the

@@ -4,7 +4,10 @@
 # changed for that service.
 stages: [build, staging, production]
 jobs:
+  # A build checks out the whole tree: npm ci and Nx read the lockfile,
+  # nx.json and every workspace project.
   build:
+    kind: build
     stage: build
     image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
     # Nx Cloud's remote cache: this read-write token reaches only this
@@ -20,18 +23,21 @@ jobs:
       bundle: { path: "dist/*.js" }
   # esbuild bundles are byte-reproducible and carry no comments: a change
   # that leaves this service's bundle identical (a comment in a library, a
-  # test) builds and stops here. The deploys run when the bundle they ship
-  # is new to them, or when the deploy script changed since they last ran.
+  # test) builds and stops here. The deploys check out only deploy/ and run
+  # when the bundle they ship is new to them, or when the deploy script
+  # changed since they last ran.
   deploy_staging:
+    kind: deploy
     stage: staging
     image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
     consumes: [build/bundle]
-    paths: [deploy]
+    checkout: [deploy]
     script: deploy/deploy.sh $SERVICE staging
   deploy_prod:
+    kind: deploy
     stage: production
     image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
     needs: [deploy_staging]
     consumes: [build/bundle]
-    paths: [deploy]
+    checkout: [deploy]
     script: deploy/deploy.sh $SERVICE production

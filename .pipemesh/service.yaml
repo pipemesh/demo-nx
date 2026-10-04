@@ -34,6 +34,7 @@ jobs:
   # changed since they last ran.
   deploy_staging:
     job_type: deploy
+    production: false
     stage: staging
     image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
     consumes:
@@ -43,6 +44,7 @@ jobs:
     script: deploy/deploy.sh $SERVICE staging
   deploy_prod:
     job_type: deploy
+    production: true
     stage: production
     image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
     needs:

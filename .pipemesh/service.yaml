@@ -2,42 +2,53 @@
 # service (orders, payments, …) with SERVICE set; each copy has its own
 # history, board and URL, and receives only the revisions whose Nx inputs
 # changed for that service.
-stages: [build, staging, production]
+type: pipeline
+stages:
+  - build
+  - staging
+  - production
 jobs:
   # A build checks out the whole tree: npm ci and Nx read the lockfile,
   # nx.json and every workspace project.
   build:
-    kind: build
+    job_type: build
     stage: build
     image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
     # Nx Cloud's remote cache: this read-write token reaches only this
     # pipeline's builds. Pull requests never receive a secret, and Nx Cloud
     # gives runs without a token read-only access, so proposed code can
     # read the cache but never write to it.
-    secrets: [NX_CLOUD_ACCESS_TOKEN]
+    secrets:
+      - NX_CLOUD_ACCESS_TOKEN
     script: |
       npm ci --prefer-offline --no-audit --no-fund
       NX_DAEMON=false npx nx run-many -t test build -p @demo/$SERVICE
       mkdir -p dist && cp apps/$SERVICE/dist/$SERVICE.js dist/
     produces:
-      bundle: { path: "dist/*.js" }
+      bundle:
+        path: "dist/*.js"
   # esbuild bundles are byte-reproducible and carry no comments: a change
   # that leaves this service's bundle identical (a comment in a library, a
   # test) builds and stops here. The deploys check out only deploy/ and run
   # when the bundle they ship is new to them, or when the deploy script
   # changed since they last ran.
   deploy_staging:
-    kind: deploy
+    job_type: deploy
     stage: staging
     image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
-    consumes: [build/bundle]
-    checkout: [deploy]
+    consumes:
+      - build/bundle
+    checkout:
+      - deploy
     script: deploy/deploy.sh $SERVICE staging
   deploy_prod:
-    kind: deploy
+    job_type: deploy
     stage: production
     image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
-    needs: [deploy_staging]
-    consumes: [build/bundle]
-    checkout: [deploy]
+    needs:
+      - deploy_staging
+    consumes:
+      - build/bundle
+    checkout:
+      - deploy
     script: deploy/deploy.sh $SERVICE production

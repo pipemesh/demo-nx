@@ -1,12 +1,14 @@
 # Pull request checks: test and build only the projects the change can
 # affect, as Nx computes them against the merge base.
-stages: [test]
+type: workflow
+stages:
+  - test
 jobs:
   # A task: what it tests depends on the merge base, not only on the
   # tree, so it runs on every pull request revision. It checks out the
   # whole tree: the Nx project graph spans it.
   affected:
-    kind: task
+    job_type: task
     stage: test
     checkout: true
     image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c

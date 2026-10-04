@@ -3,12 +3,13 @@
 # pipemesh.yaml and .pipemesh/*.yaml.
 stages: [image]
 jobs:
+  # A build: it checks out what the image bakes in (the Dockerfile and
+  # the workspace's package manifests), and a run whose checkout matches
+  # a stored run reuses it.
   ci_image:
+    kind: build
     stage: image
-    paths: [ci, .dockerignore, package.json, package-lock.json, apps/*/package.json, libs/*/package.json]
-    # A run whose fingerprint matches a stored run reuses it; a workflow
-    # run has no "unchanged" (Pipemesh, 2026-10-01).
-    skip: built
+    checkout: [ci, .dockerignore, package.json, package-lock.json, apps/*/package.json, libs/*/package.json]
     secrets: [GHCR_TOKEN]
     script: |
       img=ghcr.io/pipemesh/demo-nx-ci

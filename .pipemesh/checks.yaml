@@ -11,8 +11,22 @@ jobs:
     job_type: task
     stage: test
     checkout: true
-    image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
+    image: node:24-bookworm@sha256:14078204b6bb268c107ceff6d3c43f45a888105e5c2b18b14c32b3409d93a1b0
+    # npm's download cache, per lockfile: npm ci installs from it.
+    cache:
+      key: npm-${checksum:package-lock.json}
+      restore_keys:
+        - npm-
+      paths:
+        - .npm
+    variables:
+      npm_config_cache: .npm
+      NX_DAEMON: "false"
+      # In CI, Nx Cloud uploads each run's CPU and memory metrics to a "run
+      # group" only its own CI integrations create; ours never exists, and
+      # every job spent about a minute retrying the upload on a 404.
+      NX_CLOUD_DISABLE_METRICS_COLLECTION: "true"
     script: |
       npm ci --prefer-offline --no-audit --no-fund
       base=$(git merge-base "origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" HEAD)
-      NX_DAEMON=false npx nx affected -t test build --base="$base" --head=HEAD
+      npx nx affected -t test build --base="$base" --head=HEAD

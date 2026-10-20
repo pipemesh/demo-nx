@@ -18,6 +18,14 @@ tested with Node's built-in test runner.
   they ship is new to them. esbuild output is byte-reproducible and drops
   comments, so a comment or a test change builds and stops there.
 
+- **Test reports.** Every project's `test` script also writes its results
+  as Markdown (`tools/markdown-reporter.mjs`, a `node:test` reporter), and
+  each service's build shows its own in the job panel's Reports tab,
+  passing or failing. Nx keeps the report with a cached test run.
+- **No CI image to maintain.** Jobs run on `node:24-bookworm` (pinned by
+  digest) and keep npm's download cache in a Pipemesh cache keyed on
+  `package-lock.json`.
+
 Measured on pipemesh.io (revisions 5–9):
 
 | Change | Services dispatched | Deploys |

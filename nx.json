@@ -26,9 +26,13 @@
     "test": {
       "inputs": [
         "default",
-        "^production"
+        "^production",
+        "{workspaceRoot}/tools/markdown-reporter.mjs"
       ],
-      "cache": true
+      "cache": true,
+      "outputs": [
+        "{projectRoot}/reports"
+      ]
     }
   },
   "nxCloudId": "6abb326f4f842dbe43911223"

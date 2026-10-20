@@ -8,6 +8,6 @@
   },
   "scripts": {
     "build": "esbuild src/main.ts --bundle --platform=node --format=esm --outfile=dist/notifications.js",
-    "test": "node --test src/*.test.ts"
+    "test": "mkdir -p reports && node --test --test-reporter=spec --test-reporter-destination=stdout --test-reporter=../../tools/markdown-reporter.mjs --test-reporter-destination=reports/tests.md src/*.test.ts"
   }
 }

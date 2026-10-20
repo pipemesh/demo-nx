@@ -13,20 +13,47 @@ jobs:
   build:
     job_type: build
     stage: build
-    image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
+    image: node:24-bookworm@sha256:14078204b6bb268c107ceff6d3c43f45a888105e5c2b18b14c32b3409d93a1b0
     # Nx Cloud's remote cache: this read-write token reaches only this
     # pipeline's builds. Pull requests never receive a secret, and Nx Cloud
     # gives runs without a token read-only access, so proposed code can
     # read the cache but never write to it.
     secrets:
       - NX_CLOUD_ACCESS_TOKEN
+    # npm's download cache, per lockfile: npm ci installs from it.
+    cache:
+      key: npm-${checksum:package-lock.json}
+      restore_keys:
+        - npm-
+      paths:
+        - .npm
+    variables:
+      npm_config_cache: .npm
+      NX_DAEMON: "false"
+      # In CI, Nx Cloud uploads each run's CPU and memory metrics to a "run
+      # group" only its own CI integrations create; ours never exists, and
+      # every job spent about a minute retrying the upload on a 404.
+      NX_CLOUD_DISABLE_METRICS_COLLECTION: "true"
+    # The service's test report is kept whether its tests pass or not: a
+    # failing run is when it matters most. Nx restores it with a cached
+    # test run (outputs in nx.json).
     script: |
       npm ci --prefer-offline --no-audit --no-fund
-      NX_DAEMON=false npx nx run-many -t test build -p @demo/$SERVICE
+      rc=0
+      npx nx run-many -t test build -p @demo/$SERVICE || rc=$?
+      mkdir -p reports && cp apps/$SERVICE/reports/tests.md reports/ 2>/dev/null || true
+      [ "$rc" -eq 0 ] || exit "$rc"
       mkdir -p dist && cp apps/$SERVICE/dist/$SERVICE.js dist/
     produces:
       bundle:
         path: "dist/*.js"
+    # The Reports tab: the service's node:test results as Markdown
+    # (tools/markdown-reporter.mjs). No job consumes a report and it is in
+    # no fingerprint.
+    reports:
+      tests:
+        path: reports/tests.md
+        title: Tests
   # esbuild bundles are byte-reproducible and carry no comments: a change
   # that leaves this service's bundle identical (a comment in a library, a
   # test) builds and stops here. The deploys check out only deploy/ and run
@@ -36,7 +63,7 @@ jobs:
     job_type: deploy
     production: false
     stage: staging
-    image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
+    image: node:24-bookworm@sha256:14078204b6bb268c107ceff6d3c43f45a888105e5c2b18b14c32b3409d93a1b0
     consumes:
       BUNDLE: build/bundle
     checkout:
@@ -46,7 +73,7 @@ jobs:
     job_type: deploy
     production: true
     stage: production
-    image: ghcr.io/pipemesh/demo-nx-ci@sha256:36227715cf04b2a4b4278e134f8bce8ea50afe4fdf0bc7bb32d9e68ef572f03c
+    image: node:24-bookworm@sha256:14078204b6bb268c107ceff6d3c43f45a888105e5c2b18b14c32b3409d93a1b0
     needs:
       - deploy_staging
     consumes:

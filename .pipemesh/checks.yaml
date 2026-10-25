@@ -4,11 +4,11 @@ type: workflow
 stages:
   - test
 jobs:
-  # A task: what it tests depends on the merge base, not only on the
-  # tree, so it runs on every pull request revision. It checks out the
-  # whole tree: the Nx project graph spans it.
+  # A build over the whole tree (the Nx project graph spans it): a
+  # revision with the same tree as an earlier pass reuses it. What it
+  # tests is chosen against the merge base.
   affected:
-    job_type: task
+    job_type: build
     stage: test
     checkout: true
     image: node:24-bookworm@sha256:14078204b6bb268c107ceff6d3c43f45a888105e5c2b18b14c32b3409d93a1b0

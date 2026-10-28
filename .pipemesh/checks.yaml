@@ -1,12 +1,14 @@
-# Pull request checks: test and build only the projects the change can
-# affect, as Nx computes them against the merge base.
+# Pull request checks: test and build every project, reading Nx Cloud's
+# cache. A project the change leaves alone is a cache hit, so no merge
+# base is needed and the checkout stays one commit deep.
 type: workflow
 stages:
   - test
 jobs:
   # A build over the whole tree (the Nx project graph spans it): a
-  # revision with the same tree as an earlier pass reuses it. What it
-  # tests is chosen against the merge base.
+  # revision with the same tree as an earlier pass reuses it. Without a
+  # token, Nx Cloud is read-only: proposed code reads the cache the
+  # default branch's builds wrote, and never writes to it.
   affected:
     job_type: build
     stage: test
@@ -28,5 +30,4 @@ jobs:
       NX_CLOUD_DISABLE_METRICS_COLLECTION: "true"
     script: |
       npm ci --prefer-offline --no-audit --no-fund
-      base=$(git merge-base "origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" HEAD)
-      npx nx affected -t test build --base="$base" --head=HEAD
+      npx nx run-many -t test build

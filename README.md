@@ -37,7 +37,8 @@ Measured on pipemesh.io (revisions 5–9):
 | Service pipeline config (`.pipemesh/service.yaml`) | all five | none (identical bundles) |
 | `deploy/` script | all five | all five |
 
-Pull requests run `nx affected -t test build` against the merge base.
+Pull requests run `nx run-many -t test build` on Nx Cloud's cache, read-only:
+what the change leaves alone is a cache hit.
 
 **Run it locally:**
 

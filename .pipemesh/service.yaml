@@ -27,7 +27,7 @@ jobs:
         - npm-
       paths:
         - .npm
-    variables:
+    env:
       npm_config_cache: .npm
       NX_DAEMON: "false"
       # In CI, Nx Cloud uploads each run's CPU and memory metrics to a "run
